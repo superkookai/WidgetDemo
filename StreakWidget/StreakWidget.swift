@@ -49,23 +49,75 @@ struct SimpleEntry: TimelineEntry {
 struct StreakWidgetEntryView : View {
     var entry: Provider.Entry
     let data = DataService()
+    
+    @Environment(\.widgetFamily) private var family
 
+    var body: some View {
+        switch family {
+        case .systemSmall:
+            SmallStreakView(streak: entry.streak)
+        case .systemMedium:
+            MediumStreakView(streak: entry.streak)
+        default:
+            SmallStreakView(streak: entry.streak)
+        }
+    }
+}
+
+struct SmallStreakView: View {
+    let streak: Int
+    
     var body: some View {
         ZStack {
             Circle()
                 .stroke(.gray.opacity(0.1), lineWidth: 18)
             
-            let progress = Double(data.progress())/50.0
+            let progress = Double(streak)/50.0
             Circle()
                 .trim(from: 0, to: progress)
                 .stroke(.blue, style: StrokeStyle(lineWidth: 18, lineCap: .round, lineJoin: .round))
                 .rotationEffect(.degrees(-90))
             
             VStack(spacing: 0) {
-                Text("\(data.progress())")
+                Text("\(streak)")
                     .font(.title3)
                     .bold()
                     .fontDesign(.rounded)
+                Button(intent: LogEntryAppIntent()) {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+    }
+}
+
+struct MediumStreakView: View {
+    let streak: Int
+    
+    var body: some View {
+        HStack {
+            ZStack {
+                Circle()
+                    .stroke(.gray.opacity(0.1), lineWidth: 18)
+                
+                let progress = Double(streak)/50.0
+                Circle()
+                    .trim(from: 0, to: progress)
+                    .stroke(.blue, style: StrokeStyle(lineWidth: 18, lineCap: .round, lineJoin: .round))
+                    .rotationEffect(.degrees(-90))
+                
+                VStack(spacing: 0) {
+                    Text("\(streak)")
+                        .font(.title3)
+                        .bold()
+                        .fontDesign(.rounded)
+                }
+            }
+            
+            Spacer()
+            
+            VStack {
+                Text("This is on Medium!!")
                 Button(intent: LogEntryAppIntent()) {
                     Image(systemName: "plus")
                 }
